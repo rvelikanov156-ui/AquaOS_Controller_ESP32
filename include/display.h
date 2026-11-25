@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+
 // Расширенный список всех экранов
 enum ScreenState {
     SCREEN_MAIN,
