@@ -1,4 +1,5 @@
 #include "feeder.h"
+#include "relays.h"
 
 // Значения по умолчанию
 uint8_t feed1Hour = 8;        //
@@ -6,6 +7,7 @@ uint8_t feed1Minute = 0;      //
 uint8_t feed2Hour = 18;       //
 uint8_t feed2Minute = 0;      //
 uint32_t feedDuration = 5000; //
+bool feedFilterPauseEnabled = true;
 
 bool isFeeding = false;       //
 unsigned long feedStartTime = 0; //
@@ -36,6 +38,9 @@ void updateFeeder(int currentHour, int currentMinute) {
 
     if (scheduledFeedActive && !scheduleMinuteHandled) {
         scheduleMinuteHandled = true;
+        if (feedFilterPauseEnabled) {
+            pauseFilterForFeeding();
+        }
         if (!isFeeding) {
             isFeeding = true;
             feedStartTime = currentMillis;

@@ -41,6 +41,9 @@ typedef struct __attribute__((packed)) struct_message_to_slave {
     uint8_t remoteMenuField;
 } struct_message_to_slave;
 
+static_assert(sizeof(struct_message_to_slave) == 51,
+              "ESP-NOW packet layout must remain compatible with the ESP8266 receiver");
+
 typedef struct __attribute__((packed)) struct_message_from_slave {
     uint8_t command; // 0 - нажата кнопка, 1 - настройка яркости
     uint8_t param1;  // ID кнопки ИЛИ Номер канала (0-4)

@@ -528,7 +528,13 @@ void drawFeederMenu() {
 
     lcd.setCursor(0, 3);
     float durSec = feedDuration / 1000.0;
-    snprintf(buf, sizeof(buf), "%cDur: %.1fs [CLK=OK]", (subMenuIndex == 4 ? '>' : ' '), durSec);
+    char settingsLine[21];
+    snprintf(settingsLine, sizeof(settingsLine), "%cD:%.1fs %cFP:%s",
+        subMenuIndex == 4 ? '>' : ' ',
+        durSec,
+        subMenuIndex == 5 ? '>' : ' ',
+        feedFilterPauseEnabled ? "ON" : "OFF");
+    snprintf(buf, sizeof(buf), "%-20s", settingsLine);
     lcd.print(buf);
 }
 
@@ -865,8 +871,8 @@ void updateDisplay() {
             
         // --- ЭКРАН КОРМУШКИ ---
 case SCREEN_FEEDER:
-            if (action == RIGHT) { subMenuIndex = (subMenuIndex + 1) % 5; needsRedraw = true; }
-            else if (action == LEFT) { subMenuIndex = (subMenuIndex - 1 + 5) % 5; needsRedraw = true; }
+            if (action == RIGHT) { subMenuIndex = (subMenuIndex + 1) % 6; needsRedraw = true; }
+            else if (action == LEFT) { subMenuIndex = (subMenuIndex - 1 + 6) % 6; needsRedraw = true; }
             else if (action == UP) { // Плюс
                 if (subMenuIndex == 0) {
                     feed1Hour++;
@@ -881,6 +887,7 @@ case SCREEN_FEEDER:
                 }
                 else if (subMenuIndex == 3) feed2Minute = (feed2Minute + 1) % 60;
                 else if (subMenuIndex == 4) feedDuration += 100;
+                else if (subMenuIndex == 5) feedFilterPauseEnabled = true;
                 settingsChanged = true; needsRedraw = true;
             } else if (action == DOWN) { // Минус
                 if (subMenuIndex == 0) {
@@ -896,6 +903,7 @@ case SCREEN_FEEDER:
                 }
                 else if (subMenuIndex == 3) feed2Minute = (feed2Minute - 1 + 60) % 60;
                 else if (subMenuIndex == 4 && feedDuration > 100) feedDuration -= 100;
+                else if (subMenuIndex == 5) feedFilterPauseEnabled = false;
                 settingsChanged = true; needsRedraw = true;
             } else if (action == CLICK) {
                 if (settingsChanged) saveFeederSettings();

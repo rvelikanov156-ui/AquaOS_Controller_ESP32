@@ -224,6 +224,11 @@ const char index_html[] PROGMEM = R"rawliteral(
                 <input type="time" id="feed2">
             </div>
             <div class="row"><label>Duration (s):</label> <input type="number" id="feedDur" step="0.1" min="0.1"></div>
+            <div class="row">
+                <label style="display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" id="feedFilterPause"> Pause Filter for 10 minutes
+                </label>
+            </div>
             <button onclick="saveFeeder()">Save Timers</button>
             <button class="btn-manual" onclick="manualAction('/api/manual_feed')">Feed Now</button>
         </div>
@@ -498,6 +503,7 @@ const char index_html[] PROGMEM = R"rawliteral(
                 document.getElementById('feed2').disabled = !f2En;
                 document.getElementById('feed2').value = f2En ? fmtTime(data.fd2H, data.fd2M) : "";
                 document.getElementById('feedDur').value = (Number(data.fdDur) / 1000).toFixed(1);
+                document.getElementById('feedFilterPause').checked = data.fdPause;
                 // --------------------------
 
                 populateSelect('relSel', globalData.rName);
@@ -730,6 +736,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             
             let durMs = Math.round(parseFloat(document.getElementById('feedDur').value) * 1000);
             p.append('dur', durMs);
+            p.append('filterPause', document.getElementById('feedFilterPause').checked ? '1' : '0');
             
             fetch('/api/set_feeder', { method: 'POST', body: p }).then(() => showToast("Feeder Settings Saved!"));
         }
@@ -931,7 +938,8 @@ void handleGetState() {
     json += "\"fd1M\":" + String(feed1Minute) + ",";
     json += "\"fd2H\":" + String(feed2Hour) + ",";
     json += "\"fd2M\":" + String(feed2Minute) + ",";
-    json += "\"fdDur\":" + String(feedDuration);
+    json += "\"fdDur\":" + String(feedDuration) + ",";
+    json += "\"fdPause\":" + String(feedFilterPauseEnabled ? "true" : "false");
     json += "}";
     apiSend(200, "application/json", json);
 }
@@ -1193,6 +1201,9 @@ void handleSetFeeder() {
         feed2Hour = apiArg("f2H").toInt();
         feed2Minute = apiArg("f2M").toInt();
         feedDuration = apiArg("dur").toInt();
+        if (apiHasArg("filterPause")) {
+            feedFilterPauseEnabled = apiArg("filterPause") == "1";
+        }
         saveFeederSettings(); apiSend(200, "text/plain", "OK");
     } else apiSend(400, "text/plain", "Missing feeder settings");
 }

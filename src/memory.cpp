@@ -96,6 +96,7 @@ void loadAllSettings() {
     feed2Hour = preferences.getUChar("f2H", 18);
     feed2Minute = preferences.getUChar("f2M", 0);
     feedDuration = preferences.getUInt("fDur", 5000);
+    feedFilterPauseEnabled = preferences.getBool("fPause", true);
 
     // --- 7. ОСВЕЩЕНИЕ (Расширенное) ---
     if (preferences.getBytesLength("lBrt") > 0) {
@@ -240,6 +241,7 @@ void saveFeederSettings() {
     preferences.putUChar("f2H", feed2Hour);
     preferences.putUChar("f2M", feed2Minute);
     preferences.putUInt("fDur", feedDuration);
+    preferences.putBool("fPause", feedFilterPauseEnabled);
     Serial.println("Feeder settings saved!");
 }
 

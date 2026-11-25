@@ -17,6 +17,9 @@ bool schedule[4][48] = {0}; //[cite: 1]
 static bool maintenanceOff[4] = {false, false, false, false};
 static unsigned long maintenanceStartedAt[4] = {0, 0, 0, 0};
 static const unsigned long maintenanceDurationMs = 30UL * 60UL * 1000UL;
+static bool feedingPauseOff[4] = {false, false, false, false};
+static unsigned long feedingPauseStartedAt[4] = {0, 0, 0, 0};
+static const unsigned long feedingPauseDurationMs = 10UL * 60UL * 1000UL;
 
 static bool isFilterRelay(int channel) {
     String lowerName = relayNames[channel];
@@ -49,6 +52,17 @@ void updateRelays(float currentTempWater, int currentHour, int currentMinute) {
 
             maintenanceOff[i] = false;
             Serial.printf("Filter relay %d (%s) returned to automatic control after maintenance\n",
+                          i + 1, relayNames[i].c_str());
+        }
+
+        if (feedingPauseOff[i]) {
+            if (millis() - feedingPauseStartedAt[i] < feedingPauseDurationMs) {
+                if (relayState[i]) applyRelayState(i, false);
+                continue;
+            }
+
+            feedingPauseOff[i] = false;
+            Serial.printf("Filter relay %d (%s) returned to automatic control after feeding\n",
                           i + 1, relayNames[i].c_str());
         }
 
@@ -94,4 +108,19 @@ bool toggleFilterMaintenance() {
 
     Serial.println("Filter relay not found. Name its outlet 'Filter' or 'Фильтр'.");
     return false;
+}
+
+void pauseFilterForFeeding() {
+    for (int i = 0; i < 4; i++) {
+        if (!isFilterRelay(i)) continue;
+
+        feedingPauseOff[i] = true;
+        feedingPauseStartedAt[i] = millis();
+        applyRelayState(i, false);
+        Serial.printf("Filter relay %d (%s) disabled for feeding\n",
+                      i + 1, relayNames[i].c_str());
+        return;
+    }
+
+    Serial.println("Filter relay not found. Name its outlet 'Filter' or 'Фильтр'.");
 }

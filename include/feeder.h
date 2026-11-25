@@ -12,6 +12,7 @@ extern uint8_t feed1Minute;
 extern uint8_t feed2Hour;
 extern uint8_t feed2Minute;
 extern uint32_t feedDuration; // Длительность прокрутки в мс
+extern bool feedFilterPauseEnabled;
 
 // Текущий статус для веб-сервера или других модулей
 extern bool isFeeding;

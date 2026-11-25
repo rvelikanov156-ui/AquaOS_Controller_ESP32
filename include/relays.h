@@ -22,5 +22,6 @@ extern bool schedule[4][48];   // 48 интервалов (по 30 минут)
 void initRelays();
 void updateRelays(float currentTempWater, int currentHour, int currentMinute);
 bool toggleFilterMaintenance();
+void pauseFilterForFeeding();
 
 #endif // RELAYS_H

@@ -30,7 +30,7 @@ static uint8_t remoteMenuFieldCount() {
         case 0: return 5;
         case 1: case 2: return 4;
         case 3: return 1;
-        case 4: return 5;
+        case 4: return 6;
         case 6: return 6;
         default: return 0;
     }
@@ -90,8 +90,9 @@ static void adjustRemoteSetting(int direction) {
             else if (remoteMenuField == 1) feed1Minute = adjustMinute(feed1Minute, direction);
             else if (remoteMenuField == 2) feed2Hour = adjustOptionalHour(feed2Hour, direction);
             else if (remoteMenuField == 3) feed2Minute = adjustMinute(feed2Minute, direction);
-            else if (direction > 0 && feedDuration <= 599900) feedDuration += 100;
-            else if (direction < 0 && feedDuration > 100) feedDuration -= 100;
+            else if (remoteMenuField == 4 && direction > 0 && feedDuration <= 599900) feedDuration += 100;
+            else if (remoteMenuField == 4 && direction < 0 && feedDuration > 100) feedDuration -= 100;
+            else if (remoteMenuField == 5) feedFilterPauseEnabled = direction > 0;
             break;
         case 6:
             if (remoteMenuField < 5) {
